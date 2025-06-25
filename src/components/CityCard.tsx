@@ -10,9 +10,10 @@ import StartStudyModal from './StartStudyModal';
 interface CityCardProps {
   city: City;
   onStartStudy: (goalMinutes: number) => void;
+  onViewCity: () => void;
 }
 
-const CityCard = ({ city, onStartStudy }: CityCardProps) => {
+const CityCard = ({ city, onStartStudy, onViewCity }: CityCardProps) => {
   const [isStartStudyOpen, setIsStartStudyOpen] = useState(false);
   
   const completedBuildings = city.buildings.filter(b => b.completed).length;
@@ -20,21 +21,20 @@ const CityCard = ({ city, onStartStudy }: CityCardProps) => {
 
   return (
     <>
-      <Card className="group hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-0 bg-white/60 backdrop-blur-sm">
+      <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] border-0 bg-white/70 backdrop-blur-sm rounded-2xl overflow-hidden">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div 
-                className="w-4 h-4 rounded-full shadow-sm"
-                style={{ backgroundColor: city.color }}
+                className={`w-6 h-6 rounded-full shadow-lg bg-gradient-to-r ${city.gradient}`}
               />
-              <CardTitle className="text-lg font-semibold text-gray-800">
+              <CardTitle className="text-xl font-bold text-gray-800 font-fredoka">
                 {city.name}
               </CardTitle>
             </div>
             <Badge 
               variant="secondary" 
-              className="bg-yellow-100 text-yellow-800 border-yellow-200"
+              className="bg-gradient-to-r from-yellow-200 to-orange-200 text-orange-800 border-orange-300 font-comic-neue"
             >
               <Coins className="w-3 h-3 mr-1" />
               {city.totalCoins}
@@ -44,53 +44,70 @@ const CityCard = ({ city, onStartStudy }: CityCardProps) => {
         
         <CardContent className="space-y-4">
           {/* City Skyline Visualization */}
-          <div className="h-32 bg-gradient-to-b from-blue-100 to-green-100 rounded-lg p-4 relative overflow-hidden">
+          <div className={`h-40 bg-gradient-to-b from-sky-200 to-green-200 rounded-xl p-4 relative overflow-hidden shadow-inner`}>
             <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center gap-1">
               {city.buildings.length === 0 ? (
-                <div className="text-center text-gray-500 text-sm absolute inset-0 flex items-center justify-center">
+                <div className="text-center text-gray-600 text-sm absolute inset-0 flex items-center justify-center">
                   <div>
-                    <div className="text-2xl mb-1">🏗️</div>
-                    <div>No buildings yet</div>
+                    <div className="text-4xl mb-2">🏗️</div>
+                    <div className="font-comic-neue font-semibold">Ready to build!</div>
                   </div>
                 </div>
               ) : (
-                city.buildings.slice(0, 8).map((building, index) => (
-                  <div
-                    key={building.id}
-                    className={`w-6 rounded-t-sm transition-all duration-500 ${
-                      building.completed 
-                        ? 'bg-gradient-to-t from-blue-400 to-blue-500' 
-                        : 'bg-gradient-to-t from-gray-300 to-gray-400'
-                    }`}
-                    style={{ 
-                      height: `${Math.max(20, building.height * 0.8)}px`,
-                      animationDelay: `${index * 100}ms`
-                    }}
-                    title={`${building.sessionDuration}min session ${building.completed ? '✓' : '⚠️'}`}
-                  />
-                ))
+                city.buildings.slice(0, 10).map((building, index) => {
+                  const height = Math.max(25, building.height * 0.9);
+                  const buildingType = building.sessionDuration >= 60 ? '🏢' : building.completed ? '🏠' : '🏘️';
+                  
+                  return (
+                    <div key={building.id} className="relative group">
+                      <div
+                        className={`w-7 rounded-t-lg transition-all duration-700 shadow-lg ${
+                          building.completed 
+                            ? 'bg-gradient-to-t from-blue-500 to-blue-300' 
+                            : 'bg-gradient-to-t from-gray-400 to-gray-300'
+                        }`}
+                        style={{ 
+                          height: `${height}px`,
+                          animationDelay: `${index * 100}ms`
+                        }}
+                        title={`${building.sessionDuration}min session ${building.completed ? '✓' : '⚠️'}`}
+                      />
+                      <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                        {buildingType}
+                      </div>
+                    </div>
+                  );
+                })
               )}
-              {city.buildings.length > 8 && (
-                <div className="text-xs text-gray-500 ml-2 flex items-end pb-1">
-                  +{city.buildings.length - 8}
+              {city.buildings.length > 10 && (
+                <div className="text-xs text-gray-600 ml-2 flex items-end pb-1 font-comic-neue">
+                  +{city.buildings.length - 10} more
                 </div>
               )}
             </div>
+            
+            {/* Decorative elements */}
+            {completedBuildings > 3 && (
+              <div className="absolute bottom-1 right-2 text-lg animate-bounce">🌳</div>
+            )}
+            {completedBuildings > 5 && (
+              <div className="absolute bottom-1 left-2 text-lg animate-bounce" style={{ animationDelay: '0.5s' }}>🎠</div>
+            )}
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="bg-white/50 rounded-lg p-3">
-              <div className="text-lg font-bold text-gray-800">{city.buildings.length}</div>
-              <div className="text-xs text-gray-600">Buildings</div>
+            <div className="bg-gradient-to-br from-white/60 to-white/40 rounded-xl p-3 backdrop-blur-sm">
+              <div className="text-xl font-bold text-gray-800 font-fredoka">{city.buildings.length}</div>
+              <div className="text-xs text-gray-600 font-comic-neue">Buildings</div>
             </div>
-            <div className="bg-white/50 rounded-lg p-3">
-              <div className="text-lg font-bold text-green-600">{completedBuildings}</div>
-              <div className="text-xs text-gray-600">Completed</div>
+            <div className="bg-gradient-to-br from-green-100/60 to-green-100/40 rounded-xl p-3 backdrop-blur-sm">
+              <div className="text-xl font-bold text-green-600 font-fredoka">{completedBuildings}</div>
+              <div className="text-xs text-gray-600 font-comic-neue">Completed</div>
             </div>
-            <div className="bg-white/50 rounded-lg p-3">
-              <div className="text-lg font-bold text-purple-600">{totalRooms}</div>
-              <div className="text-xs text-gray-600">Rooms</div>
+            <div className="bg-gradient-to-br from-purple-100/60 to-purple-100/40 rounded-xl p-3 backdrop-blur-sm">
+              <div className="text-xl font-bold text-purple-600 font-fredoka">{totalRooms}</div>
+              <div className="text-xs text-gray-600 font-comic-neue">Rooms</div>
             </div>
           </div>
 
@@ -98,18 +115,18 @@ const CityCard = ({ city, onStartStudy }: CityCardProps) => {
           <div className="flex gap-2">
             <Button 
               onClick={() => setIsStartStudyOpen(true)}
-              className="flex-1 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-medium"
+              className="flex-1 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold font-comic-neue rounded-xl"
             >
               <Play className="w-4 h-4 mr-2" />
               Study
             </Button>
             <Button 
+              onClick={onViewCity}
               variant="outline" 
-              className="bg-white/50 hover:bg-white/80 border-gray-200"
-              disabled={totalRooms === 0}
+              className="bg-white/60 hover:bg-white/80 border-2 border-purple-200 hover:border-purple-400 font-comic-neue rounded-xl"
             >
               <Eye className="w-4 h-4 mr-2" />
-              Rooms
+              View City
             </Button>
           </div>
         </CardContent>
@@ -119,7 +136,7 @@ const CityCard = ({ city, onStartStudy }: CityCardProps) => {
         isOpen={isStartStudyOpen}
         onClose={() => setIsStartStudyOpen(false)}
         cityName={city.name}
-        cityColor={city.color}
+        cityGradient={city.gradient}
         onStartStudy={onStartStudy}
       />
     </>

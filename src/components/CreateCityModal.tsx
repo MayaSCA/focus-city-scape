@@ -13,95 +13,98 @@ import {
 interface CreateCityModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateCity: (name: string, color: string) => void;
+  onCreateCity: (name: string, gradient: string) => void;
 }
 
-const CITY_COLORS = [
-  { name: 'Ocean Blue', value: '#0ea5e9' },
-  { name: 'Forest Green', value: '#10b981' },
-  { name: 'Sunset Orange', value: '#f59e0b' },
-  { name: 'Royal Purple', value: '#8b5cf6' },
-  { name: 'Rose Pink', value: '#ec4899' },
-  { name: 'Coral Red', value: '#ef4444' },
-  { name: 'Emerald', value: '#059669' },
-  { name: 'Indigo', value: '#6366f1' },
+const CITY_GRADIENTS = [
+  { name: 'Sunset Dreams', value: 'from-pink-400 via-purple-400 to-orange-300' },
+  { name: 'Ocean Breeze', value: 'from-blue-400 via-cyan-300 to-teal-300' },
+  { name: 'Forest Magic', value: 'from-green-400 via-emerald-300 to-lime-300' },
+  { name: 'Cherry Blossom', value: 'from-pink-300 via-rose-300 to-red-300' },
+  { name: 'Lavender Fields', value: 'from-purple-300 via-violet-300 to-indigo-300' },
+  { name: 'Golden Hour', value: 'from-yellow-300 via-amber-300 to-orange-300' },
+  { name: 'Mint Chocolate', value: 'from-green-300 via-teal-300 to-cyan-300' },
+  { name: 'Cotton Candy', value: 'from-pink-200 via-purple-200 to-blue-200' },
 ];
 
 const CreateCityModal = ({ isOpen, onClose, onCreateCity }: CreateCityModalProps) => {
   const [name, setName] = useState('');
-  const [selectedColor, setSelectedColor] = useState(CITY_COLORS[0].value);
+  const [selectedGradient, setSelectedGradient] = useState(CITY_GRADIENTS[0].value);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      onCreateCity(name.trim(), selectedColor);
+      onCreateCity(name.trim(), selectedGradient);
       setName('');
-      setSelectedColor(CITY_COLORS[0].value);
+      setSelectedGradient(CITY_GRADIENTS[0].value);
     }
   };
 
   const handleClose = () => {
     setName('');
-    setSelectedColor(CITY_COLORS[0].value);
+    setSelectedGradient(CITY_GRADIENTS[0].value);
     onClose();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-pink-50 to-purple-50 border-2 border-pink-200">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-gray-800">
-            Create New Study City
+          <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-fredoka">
+            🏙️ Create Your Study City
           </DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="cityName" className="text-sm font-medium text-gray-700">
-              Subject Name
+          <div className="space-y-3">
+            <Label htmlFor="cityName" className="text-lg font-semibold text-gray-700 font-comic-neue">
+              Subject Name ✨
             </Label>
             <Input
               id="cityName"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Mathematics, Psychology, Biology..."
-              className="w-full"
+              placeholder="e.g., Mathematics, Psychology, Art..."
+              className="w-full text-lg font-comic-neue border-2 border-pink-200 focus:border-purple-400 rounded-xl"
               autoFocus
             />
           </div>
 
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-gray-700">
-              City Color
+          <div className="space-y-4">
+            <Label className="text-lg font-semibold text-gray-700 font-comic-neue">
+              Choose Your City Theme 🎨
             </Label>
-            <div className="grid grid-cols-4 gap-3">
-              {CITY_COLORS.map((color) => (
+            <div className="grid grid-cols-2 gap-3">
+              {CITY_GRADIENTS.map((gradient) => (
                 <button
-                  key={color.value}
+                  key={gradient.value}
                   type="button"
-                  onClick={() => setSelectedColor(color.value)}
-                  className={`w-full h-12 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                    selectedColor === color.value 
-                      ? 'border-gray-400 ring-2 ring-gray-300' 
-                      : 'border-gray-200 hover:border-gray-300'
+                  onClick={() => setSelectedGradient(gradient.value)}
+                  className={`w-full h-16 rounded-xl border-3 transition-all duration-300 hover:scale-105 bg-gradient-to-r ${gradient.value} ${
+                    selectedGradient === gradient.value 
+                      ? 'border-purple-500 ring-4 ring-purple-200 scale-105' 
+                      : 'border-gray-200 hover:border-purple-300'
                   }`}
-                  style={{ backgroundColor: color.value }}
-                  title={color.name}
-                />
+                  title={gradient.name}
+                >
+                  <div className="text-white font-bold text-sm font-comic-neue drop-shadow-lg">
+                    {gradient.name}
+                  </div>
+                </button>
               ))}
             </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="outline" onClick={handleClose} className="font-comic-neue">
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={!name.trim()}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 font-fredoka font-bold text-lg px-6"
             >
-              Create City
+              Create City 🏗️
             </Button>
           </div>
         </form>

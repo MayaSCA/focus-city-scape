@@ -14,11 +14,11 @@ interface StartStudyModalProps {
   isOpen: boolean;
   onClose: () => void;
   cityName: string;
-  cityColor: string;
+  cityGradient: string;
   onStartStudy: (goalMinutes: number) => void;
 }
 
-const StartStudyModal = ({ isOpen, onClose, cityName, cityColor, onStartStudy }: StartStudyModalProps) => {
+const StartStudyModal = ({ isOpen, onClose, cityName, cityGradient, onStartStudy }: StartStudyModalProps) => {
   const [goalMinutes, setGoalMinutes] = useState([45]);
 
   const handleStart = () => {
@@ -38,72 +38,71 @@ const StartStudyModal = ({ isOpen, onClose, cityName, cityColor, onStartStudy }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+          <DialogTitle className="text-xl font-bold text-gray-800 flex items-center gap-3 font-fredoka">
             <div 
-              className="w-4 h-4 rounded-full"
-              style={{ backgroundColor: cityColor }}
+              className={`w-6 h-6 rounded-full bg-gradient-to-r ${cityGradient} shadow-lg`}
             />
-            Study Session: {cityName}
+            Study Session: {cityName} 📚
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
           <div className="space-y-4">
-            <Label className="text-sm font-medium text-gray-700">
-              Study Goal: {goalMinutes[0]} minutes
+            <Label className="text-lg font-semibold text-gray-700 font-comic-neue">
+              Study Goal: {goalMinutes[0]} minutes ⏰
             </Label>
             <Slider
               value={goalMinutes}
               onValueChange={setGoalMinutes}
               max={180}
-              min={30}
+              min={1}
               step={15}
               className="w-full"
             />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>30 min</span>
+            <div className="flex justify-between text-sm text-gray-500 font-comic-neue">
+              <span>1 min</span>
               <span>3 hours</span>
             </div>
           </div>
 
           {/* Reward Preview */}
-          <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4">
-            <h3 className="font-medium text-gray-800 mb-2">If you complete this session:</h3>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-yellow-600">💰</span>
-                <span className="text-gray-700">Earn {reward.totalCoins} coins</span>
+          <div className="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-xl p-4">
+            <h3 className="font-bold text-gray-800 mb-3 font-fredoka text-lg">🎁 Study Rewards:</h3>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-comic-neue">
+                <span className="text-2xl">💰</span>
+                <span className="text-gray-700 font-semibold">Earn {reward.totalCoins} coins</span>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-blue-600">🏢</span>
-                <span className="text-gray-700">Build a new full-height building</span>
+              <div className="flex items-center gap-2 text-sm font-comic-neue">
+                <span className="text-2xl">🏢</span>
+                <span className="text-gray-700 font-semibold">Build a beautiful new structure</span>
               </div>
               {reward.rooms > 0 && (
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-purple-600">🏠</span>
-                  <span className="text-gray-700">Unlock {reward.rooms} room{reward.rooms > 1 ? 's' : ''} to decorate</span>
+                <div className="flex items-center gap-2 text-sm font-comic-neue">
+                  <span className="text-2xl">🏠</span>
+                  <span className="text-gray-700 font-semibold">Unlock {reward.rooms} decoration space{reward.rooms > 1 ? 's' : ''}</span>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-            <p className="text-sm text-orange-800">
-              <strong>⚠️ Remember:</strong> If you don't meet your goal, your building will be shorter - a gentle reminder to stay focused next time!
+          <div className="bg-gradient-to-r from-orange-100 to-pink-100 border-2 border-orange-300 rounded-xl p-4">
+            <p className="text-sm text-orange-800 font-comic-neue">
+              <strong>⚠️ Remember:</strong> Short buildings are cute too, but tall ones unlock more goodies! 🎈
             </p>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} className="font-comic-neue">
               Cancel
             </Button>
             <Button 
               onClick={handleStart}
-              className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 font-medium"
+              className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 font-fredoka font-bold text-lg px-6"
             >
-              Start Studying
+              Start Studying! 🚀
             </Button>
           </div>
         </div>
