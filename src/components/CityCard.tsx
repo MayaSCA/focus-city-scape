@@ -4,6 +4,17 @@ import { Play, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { City } from '@/pages/Index';
 import StartStudyModal from './StartStudyModal';
 
@@ -26,14 +37,31 @@ const CityCard = ({ city, onStartStudy, onViewCity, onDeleteCity }: CityCardProp
       <Card className={`bg-gradient-to-br ${city.gradient} border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden`}>
         <CardHeader className="relative">
           <div className="absolute top-2 right-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onDeleteCity}
-              className="text-white/70 hover:text-white hover:bg-white/20 p-1 h-8 w-8"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/70 hover:text-white hover:bg-white/20 p-1 h-8 w-8"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to delete {city.name} City?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your city with all {city.buildings.length} buildings and {city.totalCoins} coins.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={onDeleteCity} className="bg-red-600 hover:bg-red-700">
+                    Delete City
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
           <CardTitle className="text-2xl font-bold text-white drop-shadow-lg font-fredoka">
             {city.name}
