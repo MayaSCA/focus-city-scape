@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Plus, Ribbon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -38,12 +37,12 @@ export interface StudyRibbon {
 }
 
 const STUDY_RIBBONS: StudyRibbon[] = [
-  { id: '1', name: 'Study Sprout', hoursRequired: 10, emoji: '🌱', unlocks: ['Parks'], earned: false },
-  { id: '2', name: 'Learning Explorer', hoursRequired: 50, emoji: '🗺️', unlocks: ['Entertainment'], earned: false },
-  { id: '3', name: 'Knowledge Builder', hoursRequired: 100, emoji: '🏗️', unlocks: ['Advanced Buildings'], earned: false },
-  { id: '4', name: 'Wisdom Seeker', hoursRequired: 250, emoji: '🔮', unlocks: ['Magical Structures'], earned: false },
-  { id: '5', name: 'Master Scholar', hoursRequired: 500, emoji: '👑', unlocks: ['Royal Buildings'], earned: false },
-  { id: '6', name: 'Legend of Learning', hoursRequired: 1000, emoji: '⭐', unlocks: ['Legendary Monuments'], earned: false },
+  { id: '1', name: 'Study Sprout', hoursRequired: 1/60, emoji: '🌱', unlocks: ['Parks'], earned: false },
+  { id: '2', name: 'Learning Explorer', hoursRequired: 2/60, emoji: '🗺️', unlocks: ['Entertainment'], earned: false },
+  { id: '3', name: 'Knowledge Builder', hoursRequired: 3/60, emoji: '🏗️', unlocks: ['Advanced Buildings'], earned: false },
+  { id: '4', name: 'Wisdom Seeker', hoursRequired: 4/60, emoji: '🔮', unlocks: ['Magical Structures'], earned: false },
+  { id: '5', name: 'Master Scholar', hoursRequired: 5/60, emoji: '👑', unlocks: ['Royal Buildings'], earned: false },
+  { id: '6', name: 'Legend of Learning', hoursRequired: 6/60, emoji: '⭐', unlocks: ['Legendary Monuments'], earned: false },
 ];
 
 const Index = () => {
@@ -158,6 +157,10 @@ const Index = () => {
     setActiveStudySession(null);
   };
 
+  const deleteCity = (cityId: string) => {
+    setCities(cities.filter(city => city.id !== cityId));
+  };
+
   const earnedRibbons = ribbons.filter(r => r.earned);
 
   if (viewingCity) {
@@ -206,7 +209,7 @@ const Index = () => {
                   <Badge
                     key={ribbon.id}
                     className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-bold font-comic-neue"
-                    title={`${ribbon.name} - ${ribbon.hoursRequired}h`}
+                    title={`${ribbon.name} - ${Math.round(ribbon.hoursRequired * 60)}min`}
                   >
                     <Ribbon className="w-3 h-3 mr-1" />
                     {ribbon.emoji}
@@ -219,7 +222,7 @@ const Index = () => {
               </div>
               
               <div className="bg-gradient-to-r from-purple-400 to-pink-400 text-white px-4 py-2 rounded-full font-bold font-fredoka shadow-lg">
-                ⏰ {Math.floor(totalStudyHours)}h studied
+                ⏰ {Math.floor(totalStudyHours * 60)}min studied
               </div>
             </div>
           </div>
@@ -301,6 +304,7 @@ const Index = () => {
                   city={city} 
                   onStartStudy={(goalMinutes) => startStudySession(city.id, goalMinutes)}
                   onViewCity={() => setViewingCity(city.id)}
+                  onDeleteCity={() => deleteCity(city.id)}
                 />
               ))}
             </div>

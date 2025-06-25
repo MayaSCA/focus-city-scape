@@ -17,14 +17,14 @@ interface CreateCityModalProps {
 }
 
 const CITY_GRADIENTS = [
-  { name: 'Sunset Dreams', value: 'from-pink-400 via-purple-400 to-orange-300' },
-  { name: 'Ocean Breeze', value: 'from-blue-400 via-cyan-300 to-teal-300' },
-  { name: 'Forest Magic', value: 'from-green-400 via-emerald-300 to-lime-300' },
-  { name: 'Cherry Blossom', value: 'from-pink-300 via-rose-300 to-red-300' },
-  { name: 'Lavender Fields', value: 'from-purple-300 via-violet-300 to-indigo-300' },
-  { name: 'Golden Hour', value: 'from-yellow-300 via-amber-300 to-orange-300' },
-  { name: 'Mint Chocolate', value: 'from-green-300 via-teal-300 to-cyan-300' },
-  { name: 'Cotton Candy', value: 'from-pink-200 via-purple-200 to-blue-200' },
+  { name: 'Pink', value: 'from-pink-400 via-purple-400 to-orange-300' },
+  { name: 'Blue', value: 'from-blue-400 via-cyan-300 to-teal-300' },
+  { name: 'Green', value: 'from-green-400 via-emerald-300 to-lime-300' },
+  { name: 'Red', value: 'from-pink-300 via-rose-300 to-red-300' },
+  { name: 'Purple', value: 'from-purple-300 via-violet-300 to-indigo-300' },
+  { name: 'Orange', value: 'from-yellow-300 via-amber-300 to-orange-300' },
+  { name: 'Teal', value: 'from-green-300 via-teal-300 to-cyan-300' },
+  { name: 'Lavender', value: 'from-pink-200 via-purple-200 to-blue-200' },
 ];
 
 const CreateCityModal = ({ isOpen, onClose, onCreateCity }: CreateCityModalProps) => {

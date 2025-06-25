@@ -1,6 +1,6 @@
 
-import { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { City, Building } from '@/pages/Index';
@@ -11,53 +11,11 @@ interface CityView3DProps {
 }
 
 const CityView3D = ({ city, onBack }: CityView3DProps) => {
-  const [rotation, setRotation] = useState({ x: -20, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    
-    const deltaX = e.clientX - dragStart.x;
-    const deltaY = e.clientY - dragStart.y;
-    
-    setRotation(prev => ({
-      x: Math.max(-60, Math.min(60, prev.x - deltaY * 0.5)),
-      y: prev.y + deltaX * 0.5
-    }));
-    
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const resetView = () => {
-    setRotation({ x: -20, y: 0 });
-  };
-
   const getBuildingType = (building: Building) => {
-    // Determine building type based on study time and completion
     if (building.sessionDuration >= 120) return 'skyscraper';
     if (building.sessionDuration >= 60) return 'office';
     if (building.completed) return 'house';
     return 'small';
-  };
-
-  const getBuildingEmoji = (type: string) => {
-    switch (type) {
-      case 'skyscraper': return '🏢';
-      case 'office': return '🏬';
-      case 'house': return '🏠';
-      default: return '🏘️';
-    }
   };
 
   return (
@@ -83,31 +41,13 @@ const CityView3D = ({ city, onBack }: CityView3DProps) => {
             </p>
           </div>
 
-          <Button
-            onClick={resetView}
-            variant="outline"
-            className="bg-white/80 backdrop-blur-sm font-comic-neue"
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Reset View
-          </Button>
+          <div></div>
         </div>
 
-        {/* 3D City View */}
+        {/* City View */}
         <Card className="bg-white/10 backdrop-blur-lg border-white/20">
           <CardContent className="p-8">
-            <div
-              ref={containerRef}
-              className="relative w-full h-96 overflow-hidden rounded-xl bg-gradient-to-b from-sky-200 to-green-200 cursor-grab active:cursor-grabbing"
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              style={{
-                perspective: '1000px',
-                transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`
-              }}
-            >
+            <div className="relative w-full h-96 overflow-hidden rounded-xl bg-gradient-to-b from-sky-200 to-green-200">
               {city.buildings.length === 0 ? (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center text-gray-600">
@@ -139,27 +79,9 @@ const CityView3D = ({ city, onBack }: CityView3DProps) => {
                           height: `${height}px`,
                           width: `${width}px`,
                           animationDelay: `${index * 200}ms`,
-                          transform: `translateZ(${Math.sin(index * 0.5) * 10}px)`,
                         }}
                         title={`${building.sessionDuration}min session ${building.completed ? '✓' : '⚠️'}`}
                       >
-                        {/* Building emoji on top */}
-                        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-2xl">
-                          {getBuildingEmoji(type)}
-                        </div>
-                        
-                        {/* Windows */}
-                        <div className="absolute inset-1 grid grid-cols-2 gap-1">
-                          {Array.from({ length: Math.floor(height / 15) }).map((_, i) => (
-                            <div
-                              key={i}
-                              className={`w-2 h-2 ${
-                                building.completed ? 'bg-yellow-300' : 'bg-gray-200'
-                              } rounded-sm opacity-80`}
-                            />
-                          ))}
-                        </div>
-                        
                         {/* Hover tooltip */}
                         <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 text-white text-xs px-2 py-1 rounded font-comic-neue whitespace-nowrap">
                           {building.sessionDuration}min • {building.completed ? 'Complete' : 'Incomplete'}
@@ -181,10 +103,6 @@ const CityView3D = ({ city, onBack }: CityView3DProps) => {
                   )}
                 </div>
               )}
-            </div>
-            
-            <div className="mt-4 text-center text-white/80 font-comic-neue">
-              <p className="text-sm">Click and drag to rotate your city • Hover over buildings for details</p>
             </div>
           </CardContent>
         </Card>
