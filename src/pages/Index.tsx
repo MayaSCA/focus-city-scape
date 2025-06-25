@@ -1,8 +1,7 @@
+
 import { useState, useEffect } from 'react';
-import { Plus, Ribbon } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import CityCard from '@/components/CityCard';
 import CreateCityModal from '@/components/CreateCityModal';
 import StudyTimer from '@/components/StudyTimer';
@@ -11,7 +10,7 @@ import CityView3D from '@/components/CityView3D';
 export interface City {
   id: string;
   name: string;
-  gradient: string; // Changed from color to gradient
+  gradient: string;
   buildings: Building[];
   totalCoins: number;
 }
@@ -27,24 +26,6 @@ export interface Building {
   buildingType: 'residential' | 'office' | 'entertainment' | 'park';
 }
 
-export interface StudyRibbon {
-  id: string;
-  name: string;
-  hoursRequired: number;
-  emoji: string;
-  unlocks: string[];
-  earned: boolean;
-}
-
-const STUDY_RIBBONS: StudyRibbon[] = [
-  { id: '1', name: 'Study Sprout', hoursRequired: 1/60, emoji: '🌱', unlocks: ['Parks'], earned: false },
-  { id: '2', name: 'Learning Explorer', hoursRequired: 2/60, emoji: '🗺️', unlocks: ['Entertainment'], earned: false },
-  { id: '3', name: 'Knowledge Builder', hoursRequired: 3/60, emoji: '🏗️', unlocks: ['Advanced Buildings'], earned: false },
-  { id: '4', name: 'Wisdom Seeker', hoursRequired: 4/60, emoji: '🔮', unlocks: ['Magical Structures'], earned: false },
-  { id: '5', name: 'Master Scholar', hoursRequired: 5/60, emoji: '👑', unlocks: ['Royal Buildings'], earned: false },
-  { id: '6', name: 'Legend of Learning', hoursRequired: 6/60, emoji: '⭐', unlocks: ['Legendary Monuments'], earned: false },
-];
-
 const Index = () => {
   const [cities, setCities] = useState<City[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -55,14 +36,12 @@ const Index = () => {
   const [viewingCity, setViewingCity] = useState<string | null>(null);
   const [totalCoins, setTotalCoins] = useState(0);
   const [totalStudyHours, setTotalStudyHours] = useState(0);
-  const [ribbons, setRibbons] = useState<StudyRibbon[]>(STUDY_RIBBONS);
 
   // Load data from localStorage on mount
   useEffect(() => {
     const savedCities = localStorage.getItem('studyCities');
     const savedCoins = localStorage.getItem('totalCoins');
     const savedHours = localStorage.getItem('totalStudyHours');
-    const savedRibbons = localStorage.getItem('studyRibbons');
     
     if (savedCities) {
       setCities(JSON.parse(savedCities));
@@ -72,9 +51,6 @@ const Index = () => {
     }
     if (savedHours) {
       setTotalStudyHours(parseFloat(savedHours));
-    }
-    if (savedRibbons) {
-      setRibbons(JSON.parse(savedRibbons));
     }
   }, []);
 
@@ -89,19 +65,6 @@ const Index = () => {
 
   useEffect(() => {
     localStorage.setItem('totalStudyHours', totalStudyHours.toString());
-  }, [totalStudyHours]);
-
-  useEffect(() => {
-    localStorage.setItem('studyRibbons', JSON.stringify(ribbons));
-  }, [ribbons]);
-
-  // Update ribbons when study hours change
-  useEffect(() => {
-    const updatedRibbons = ribbons.map(ribbon => ({
-      ...ribbon,
-      earned: totalStudyHours >= ribbon.hoursRequired
-    }));
-    setRibbons(updatedRibbons);
   }, [totalStudyHours]);
 
   const createCity = (name: string, gradient: string) => {
@@ -125,12 +88,6 @@ const Index = () => {
     const coinsEarned = Math.floor(actualMinutes / 5) + (goalMet ? 10 : 0);
     const hoursStudied = actualMinutes / 60;
     
-    // Determine building type based on study duration and ribbons
-    let buildingType: Building['buildingType'] = 'residential';
-    if (totalStudyHours >= 50 && actualMinutes >= 60) buildingType = 'entertainment';
-    else if (totalStudyHours >= 10 && actualMinutes >= 30) buildingType = 'park';
-    else if (actualMinutes >= 45) buildingType = 'office';
-    
     const newBuilding: Building = {
       id: Date.now().toString(),
       sessionDuration: actualMinutes,
@@ -139,7 +96,7 @@ const Index = () => {
       height: goalMet ? 100 : Math.max(30, (actualMinutes / goalMinutes) * 100),
       roomsUnlocked: goalMet ? Math.floor(actualMinutes / 30) : 0,
       decorations: [],
-      buildingType
+      buildingType: 'residential'
     };
 
     setCities(cities.map(city => 
@@ -161,7 +118,19 @@ const Index = () => {
     setCities(cities.filter(city => city.id !== cityId));
   };
 
-  const earnedRibbons = ribbons.filter(r => r.earned);
+  const purchaseDecoration = (buildingId: string, decorationId: string, cost: number) => {
+    if (totalCoins >= cost) {
+      setCities(cities.map(city => ({
+        ...city,
+        buildings: city.buildings.map(building => 
+          building.id === buildingId 
+            ? { ...building, decorations: [...building.decorations, decorationId] }
+            : building
+        )
+      })));
+      setTotalCoins(totalCoins - cost);
+    }
+  };
 
   if (viewingCity) {
     const city = cities.find(c => c.id === viewingCity);
@@ -169,7 +138,9 @@ const Index = () => {
       return (
         <CityView3D
           city={city}
+          totalCoins={totalCoins}
           onBack={() => setViewingCity(null)}
+          onPurchaseDecoration={purchaseDecoration}
         />
       );
     }
@@ -203,20 +174,6 @@ const Index = () => {
               <p className="text-gray-600 text-sm font-comic-neue">Build your knowledge, one adorable session at a time! 🏗️💕</p>
             </div>
             <div className="flex items-center gap-4">
-              {/* Ribbons Display */}
-              <div className="flex gap-2">
-                {earnedRibbons.slice(-3).map((ribbon) => (
-                  <Badge
-                    key={ribbon.id}
-                    className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-bold font-comic-neue"
-                    title={`${ribbon.name} - ${Math.round(ribbon.hoursRequired * 60)}min`}
-                  >
-                    <Ribbon className="w-3 h-3 mr-1" />
-                    {ribbon.emoji}
-                  </Badge>
-                ))}
-              </div>
-              
               <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-4 py-2 rounded-full font-bold font-fredoka shadow-lg">
                 💰 {totalCoins} coins
               </div>
@@ -272,30 +229,6 @@ const Index = () => {
                 New City ✨
               </Button>
             </div>
-            
-            {/* Ribbons Progress */}
-            {earnedRibbons.length > 0 && (
-              <Card className="mb-8 bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300">
-                <CardHeader>
-                  <CardTitle className="text-center font-fredoka text-2xl text-orange-800">
-                    🎖️ Your Study Achievements
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {earnedRibbons.map((ribbon) => (
-                      <Badge
-                        key={ribbon.id}
-                        className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-lg p-3 rounded-xl font-comic-neue"
-                      >
-                        <Ribbon className="w-4 h-4 mr-2" />
-                        {ribbon.emoji} {ribbon.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {cities.map(city => (

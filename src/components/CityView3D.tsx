@@ -4,18 +4,39 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { City, Building } from '@/pages/Index';
+import BuildingDecorationModal from './BuildingDecorationModal';
 
 interface CityView3DProps {
   city: City;
+  totalCoins: number;
   onBack: () => void;
+  onPurchaseDecoration: (buildingId: string, decorationId: string, cost: number) => void;
 }
 
-const CityView3D = ({ city, onBack }: CityView3DProps) => {
+const CityView3D = ({ city, totalCoins, onBack, onPurchaseDecoration }: CityView3DProps) => {
+  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
+  const [isDecorationModalOpen, setIsDecorationModalOpen] = useState(false);
+
   const getBuildingType = (building: Building) => {
     if (building.sessionDuration >= 120) return 'skyscraper';
     if (building.sessionDuration >= 60) return 'office';
     if (building.completed) return 'house';
     return 'small';
+  };
+
+  const handleBuildingClick = (building: Building) => {
+    if (building.completed) {
+      setSelectedBuilding(building);
+      setIsDecorationModalOpen(true);
+    }
+  };
+
+  const handlePurchaseDecoration = (decorationId: string, cost: number) => {
+    if (selectedBuilding) {
+      onPurchaseDecoration(selectedBuilding.id, decorationId, cost);
+      setIsDecorationModalOpen(false);
+      setSelectedBuilding(null);
+    }
   };
 
   return (
@@ -72,7 +93,7 @@ const CityView3D = ({ city, onBack }: CityView3DProps) => {
                         key={building.id}
                         className={`relative transition-all duration-700 hover:scale-110 group ${
                           building.completed 
-                            ? 'bg-gradient-to-t from-blue-500 to-blue-300' 
+                            ? 'bg-gradient-to-t from-blue-500 to-blue-300 cursor-pointer' 
                             : 'bg-gradient-to-t from-gray-400 to-gray-300'
                         } rounded-t-lg shadow-lg`}
                         style={{ 
@@ -80,27 +101,23 @@ const CityView3D = ({ city, onBack }: CityView3DProps) => {
                           width: `${width}px`,
                           animationDelay: `${index * 200}ms`,
                         }}
-                        title={`${building.sessionDuration}min session ${building.completed ? '✓' : '⚠️'}`}
+                        title={building.completed ? `Click to decorate! ${building.sessionDuration}min session ✓` : `${building.sessionDuration}min session ⚠️`}
+                        onClick={() => handleBuildingClick(building)}
                       >
+                        {/* Decoration indicators */}
+                        {building.decorations.length > 0 && (
+                          <div className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+                            {building.decorations.length}
+                          </div>
+                        )}
+                        
                         {/* Hover tooltip */}
                         <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 text-white text-xs px-2 py-1 rounded font-comic-neue whitespace-nowrap">
-                          {building.sessionDuration}min • {building.completed ? 'Complete' : 'Incomplete'}
+                          {building.sessionDuration}min • {building.completed ? (building.decorations.length > 0 ? `${building.decorations.length} decorations` : 'Click to decorate!') : 'Incomplete'}
                         </div>
                       </div>
                     );
                   })}
-                  
-                  {/* Parks and decorations */}
-                  {city.buildings.filter(b => b.completed).length > 3 && (
-                    <div className="absolute bottom-4 right-4 text-3xl animate-bounce">
-                      🌳
-                    </div>
-                  )}
-                  {city.buildings.filter(b => b.completed).length > 5 && (
-                    <div className="absolute bottom-4 left-4 text-3xl animate-bounce" style={{ animationDelay: '0.5s' }}>
-                      🎠
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -135,15 +152,27 @@ const CityView3D = ({ city, onBack }: CityView3DProps) => {
           
           <Card className="bg-white/10 backdrop-blur-lg border-white/20">
             <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">⏰</div>
+              <div className="text-2xl mb-2">🎨</div>
               <div className="text-white text-lg font-bold font-fredoka">
-                {Math.floor(city.buildings.reduce((total, b) => total + b.sessionDuration, 0) / 60)}h
+                {city.buildings.reduce((total, b) => total + b.decorations.length, 0)}
               </div>
-              <div className="text-white/80 text-sm font-comic-neue">Total Study</div>
+              <div className="text-white/80 text-sm font-comic-neue">Decorations</div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      <BuildingDecorationModal
+        isOpen={isDecorationModalOpen}
+        onClose={() => {
+          setIsDecorationModalOpen(false);
+          setSelectedBuilding(null);
+        }}
+        building={selectedBuilding}
+        cityGradient={city.gradient}
+        totalCoins={totalCoins}
+        onPurchaseDecoration={handlePurchaseDecoration}
+      />
     </div>
   );
 };
